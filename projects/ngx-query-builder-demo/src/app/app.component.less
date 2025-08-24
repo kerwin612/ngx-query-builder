@@ -3,12 +3,8 @@
 
   .content {
     display: flex;
+    flex-direction: column;
     gap: 20px;
-    justify-content: center;
-  }
-
-  ngx-query-builder, .panel {
-    flex: 1;
   }
 }
 
@@ -33,5 +29,15 @@
 }
 
 .output {
-  flex: 1;
+  height: 500px;
+  resize: both;
+  overflow: auto;
+}
+
+.output.invalid-query {
+  background-color: #f8d7da;
+}
+
+.output.invalid-json {
+  background-color: #f2bcbc;
 }

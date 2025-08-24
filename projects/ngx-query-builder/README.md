@@ -4,7 +4,18 @@
 [![npm downloads a week](https://img.shields.io/npm/dt/@kerwin612%2Fngx-query-builder.svg)](https://img.shields.io/npm/dt/@kerwin612%2Fngx-query-builder.svg)
 [![Contribute with Gitpod](https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod&color=green)](https://gitpod.io/#https://github.com/kerwin612/ngx-query-builder)
 
-A modernized Angular 4+ query builder based on jQuery QueryBuilder. Support for heavy customization with Angular components and provides a flexible way to handle custom data types.  
+A modernized Angular 4+ query builder based on jQuery QueryBuilder. Support for heavy customization with Angular components and provides a flexible way to handle custom data types.
+
+## Changes from kerwin612/ngx-query-builder
+
+- Upgraded Angular from version 18 to **19.2.14**.
+- Added optional **NOT** support for rulesets via the `allowNot` input.
+- Demo layout was revamped and now features a two-way bound JSON editor.
+- Editing the JSON textbox updates the query tree and vice versa.
+- The JSON editor validates input with lighter red for query errors and darker red for JSON errors.
+- Optional buttons allow converting a rule to a ruleset and back with `allowConvertToRuleset`.
+- Optional up/down arrows enable reordering rules when `allowRuleUpDown` is set.
+- Added a `customCollapsedSummary` callback to display summaries for collapsed rulesets.
 
 ***Forked from (https://github.com/zebzhao/Angular-QueryBuilder) as the original project has stopped updating and does not support the latest Angular versions, so I will continue to maintain it and support the latest versions of Angular.***
 
@@ -84,8 +95,8 @@ export class AppComponent {
 ##### `app.component.html`
 ```html
 <ngx-query-builder [(ngModel)]='query' [config]='config'>
-  <ng-container *queryInput="let rule; type: 'date'">
-    <custom-datepicker [(ngModel)]="rule.value"></custom-datepicker>
+  <ng-container *queryInput="let rule; type: 'date'; let onChange=onChange">
+    <custom-datepicker [(ngModel)]="rule.value" (ngModelChange)="onChange()"></custom-datepicker>
   </ng-container>
 </ngx-query-builder>
 ```
@@ -113,8 +124,14 @@ config: QueryBuilderConfig = {
 #### `ngx-query-builder`
 |Name| Type                                                                                                                                                                        |Required| Default                          |Description|
 |:--- |:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--- |:---------------------------------|:--- |
-|`allowRuleset`| `boolean`                                                                                                                                                                   |Optional| `true`                           | Displays the `+ Ruleset` button if `true`. |
-|`allowCollapse`| `boolean`                                                                                                                                                                   |Optional| `false`                          | Enables collapsible rule sets if `true`.  |
+|`allowRuleset`| `boolean` |Optional| `true` | Displays the `+ Ruleset` button if `true`. |
+|`allowCollapse`| `boolean` |Optional| `true`                          | Enables collapsible rule sets if `true`. |
+|`allowConvertToRuleset`| `boolean` |Optional| `false` | Displays the `Convert to Ruleset` button if `true`. Rulesets with a single entry also show a `Convert to Rule` button (except the root ruleset). |
+|`allowRuleUpDown`| `boolean` |Optional| `false` | Displays up and down arrows on rules and nested rulesets for reordering. |
+|`ruleName`| `string` |Optional| `'Rule'` | Label used in default buttons for rules. |
+|`rulesetName`| `string` |Optional| `'Ruleset'` | Label used in default buttons for rulesets. |
+|`defaultRuleAttribute`| `string` |Optional| | Name of the field to use as the default when adding new rules. |
+|`allowNot`| `boolean` |Optional| `false`                          | Adds a `NOT` button and sets a `not` attribute on the ruleset JSON. |
 |`classNames`| [`QueryBuilderClassNames`](/projects/ngx-query-builder/src/lib/models/query-builder.interfaces.ts#L48)                                                                      |Optional|                                  | CSS class names for different child elements in `query-builder` component. |
 |`config`| [`QueryBuilderConfig`](/projects/ngx-query-builder/src/lib/models/query-builder.interfaces.ts#L85)                                                                          |Required|                                  | Configuration object for the main component. |
 |`data`| [`Ruleset`](/projects/ngx-query-builder/src/lib/models/query-builder.interfaces.ts)                                                                                         |Optional| { condition: 'and', rules: [] }  | (Use `ngModel` or `value` instead.) |
@@ -123,6 +140,8 @@ config: QueryBuilderConfig = {
 |`operatorMap`| `{ [key: string]: string[] }`                                                                                                                                               |Optional|                                  | Used to map field types to list of operators. |
 |`persistValueOnFieldChange`| `boolean`                                                                                                                                                                   |Optional| `false`                          | If `true`, when a field changes to another of the same type, and the type is one of: string, number, time, date, or boolean, persist the previous value. This option is ignored if config.calculateFieldChangeValue is provided. |
 |`config.calculateFieldChangeValue`| `(currentField: Field, nextField: Field, currentValue: any) => any`                                                                                                         |Optional|                                  | Used to calculate the new value when a rule's field changes. |
+|`config.customCollapsedSummary`| `(ruleset: RuleSet) => string` |Optional| | Generates a custom summary string when a ruleset is collapsed. |
+|`config.rulesetNameSanitizer`| `(value: string) => string` |Optional| | Sanitizes the name when naming or updating a ruleset. Defaults to `value.toUpperCase().replace(/ /g, '_').replace(/[^A-Z0-9_]/g, '')`. |
 |`value`| [`Ruleset`](/projects/ngx-query-builder/src/lib/models/query-builder.interfaces.ts)                                                                                         |Optional| { condition: 'and', rules: [] }  | Object that stores the state of the component. |
 
 ## Structural Directives
@@ -258,7 +277,7 @@ Can be used to customize the default empty warning message, alternatively can sp
 |`getDisabledState`|`() => boolean`| Retrieves or determines the disabled state of the component|
 
 ## Dependencies
-- Angular 18+
+- Angular 19+
 
 # Development
 
